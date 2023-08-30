@@ -1,8 +1,8 @@
 ### tkx
 
-**tkx** is a utility for rendering with Tkinter.
+**tkx** is a utility for declarative rendering with Tkinter.
 
-### Overview
+#### Overview
 
 There is no need to use a virtual env since only the standard lib is used.
 
@@ -27,6 +27,6 @@ app.render().pack()
 root.mainloop()
 ```
 
-### License
+#### License
 
 MIT © 2023.
