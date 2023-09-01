@@ -4,8 +4,28 @@ import tkinter as tk
 
 class Element:
     def __init__(self, **props):
+        self._observers = []
         self.props = props
         self.children = props.get('children', [])
+
+    def _observe(self, observer):
+        observer.observe(self.render)
+
+    def __setattr__(self, name, value):
+        super().__setattr__(name, value)
+
+        # ============ immediate text in container =============
+        if type(value) is int:
+            container = self.render()
+            for child in container.children:
+                if child.__class__ is Text and child.rx is True:
+                    child = Text(text=value) # paints update
+            lfr = container.render() # next tick
+            print(type(container), type(lfr))
+            for wgt in lfr.winfo_children():
+                print(wgt)
+                wgt.destroy()
+            lfr.pack()
 
     def render(self):
         raise NotImplementedError(
@@ -34,6 +54,11 @@ class Window:
 class Text(Element):
     def render(self):
         return tk.Label(text=self.props.get('text', ''))
+    @staticmethod # triggers fine-grained rx-only updates
+    def rx(text=""):
+        instance = Text(text=text)
+        instance.rx = True
+        return instance
 
 
 class Button(Element):

@@ -1,6 +1,6 @@
 class Observer:
-    def __init__(self, initial_value=None):
-        self._value = initial_value
+    def __init__(self, value=None):
+        self._value = value
         self._callbacks = []
 
     @property
@@ -12,10 +12,22 @@ class Observer:
         if new_value != self._value:
             self._value = new_value
             for callback in self._callbacks:
-                callback(new_value)
+                callback()
 
-    def subscribe(self, callback):
+    def observe(self, callback):
         self._callbacks.append(callback)
 
-    def unsubscribe(self, callback):
-        self._callbacks.remove(callback)
+    def bind(self, prop):
+        prop.value = self._value
+        self.observe(lambda: setattr(prop, "value", self.value))
+
+
+class PropertyObserver:
+    def __init__(self, initial_value=None):
+        self._observer = Observer(initial_value)
+
+    def __get__(self, instance, owner):
+        return self._observer.value
+
+    def __set__(self, instance, value):
+        self._observer.value = value
